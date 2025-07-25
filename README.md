@@ -1,5 +1,54 @@
 # Global Landslide Detection for Rapid response (GLiDEr)
 
+This proposal aims to develop a **novel deep learning-based landslide mapping framework** that combines **diffusion models** and **foundation models** to detect event-induced landslides using very high-resolution PlanetScope and RapidEye imagery. Leveraging **archived pre- and post-event imagery** from NASA’s CSDA program, the system will undergo **multi-stage preprocessing** (including sub-pixel co-registration and latent-space denoising) and be **fine-tuned on \~40 global landslide inventories** to enhance accuracy and generalizability. The hybrid architecture will generate **probabilistic change detection maps**, providing both binary segmentation and confidence scores for improved decision-making. All resulting tools, corrected landslide inventories, and pretrained models will be released as **open-source resources** to support NASA’s disaster response efforts and the broader landslide research community.
+
+## Deliverables
+
+### Software & Data Processing
+- **Planet Data Downloader**  
+  - Python-based pipeline for automated search, ordering, and downloading of PlanetScope and RapidEye imagery from the CSDA archive.  
+  - Support for AOI-based search (GeoJSON/Shapefile), multi-date filtering, and cloud cover thresholds.  
+  - Exports metadata as **GeoJSON**/**GPKG** for downstream processing.  
+  - Modular design for integration into rapid response and research workflows.
+
+- **Image Preprocessing Framework**  
+  - Automated co-registration of pre- and post-event imagery using phase correlation for sub-pixel alignment.  
+  - Multi-stage preprocessing including **latent-space diffusion denoising** to correct for sensor noise, shadows, and environmental artifacts.  
+  - Data augmentation and standardization for robust model training across heterogeneous VHR imagery sources.
+
+### Deep Learning & Model Development
+- **Hybrid Change Detection Model**  
+  - A novel **diffusion-foundation model hybrid** architecture for landslide detection.  
+  - **Diffusion model** trained to reconstruct pre-event terrain conditions for robust change estimation.  
+  - **DINOv2 foundation model** fine-tuned using contrastive learning to extract multi-scale spatial features.  
+  - **Cross-attention integration** between diffusion and foundation model components for improved segmentation accuracy.  
+
+- **Landslide Change Probability Mapping**  
+  - Generates **continuous change probability maps** highlighting landslide-impacted regions.  
+  - Capability to produce both **binary segmentation masks** and probabilistic risk surfaces for downstream hazard modeling.
+
+- **Uncertainty-Aware Inference**  
+  - Incorporation of uncertainty-aware diffusion sampling for probabilistic change detection.  
+  - Confidence scoring for each detected landslide to support prioritization and manual review in operational workflows.
+
+### Data Products
+- **Curated Landslide Inventories**  
+  - Quality-controlled, corrected event-based inventories for ~40 global landslide sites.  
+  - Inventories aligned with pre- and post-event Planet imagery for training and testing.
+
+- **Pretrained Landslide Detection Model**  
+  - Fine-tuned model weights for rapid deployment in disaster response scenarios.  
+  - Open-source release of the trained model and mapping framework for the research community.
+
+### Evaluation & Reporting
+- **Vendor Data Evaluation**  
+  - Assessment of CSDA’s Planet imagery archive for landslide detection, including accessibility, spectral stability, and geolocation accuracy.  
+  - Documentation of vendor support quality and platform usability.
+
+- **Model Validation Report**  
+  - Multi-resolution independent validation of the model using 20% held-out landslide inventories.  
+  - Uncertainty quantification and analysis of model performance across diverse geographies.
+
 ## Container
 
 ```bash
