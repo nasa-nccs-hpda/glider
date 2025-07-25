@@ -76,6 +76,7 @@ RUN git clone --single-branch --branch master https://github.com/pkolano/shift.g
     rm -rf /app
 
 # Pip
+RUN pip install --no-cache-dir --ignore-installed blinker terratorch
 RUN pip --no-cache-dir install \
     pytorch-lightning \
     Lightning \
@@ -114,7 +115,10 @@ RUN pip --no-cache-dir install \
     netCDF4 \
     h5py \
     goes2go \
-    planet
+    planet \
+    gdown \
+    wandb \
+    git+https://github.com/VMarsocci/pangaea-bench.git@main
 
 HEALTHCHECK NONE
 ENTRYPOINT []
