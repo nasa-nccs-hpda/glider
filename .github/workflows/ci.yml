@@ -1,0 +1,26 @@
+name: Test in DockerHub Container
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Pull your Docker image
+      run: |
+        docker pull nasanccs/satvision-pix4d:latest
+
+    - name: Run tests inside Docker
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          nasanccs/satvision-pix4d:latest \
+          bash -c "cd /workspace && pytest"
