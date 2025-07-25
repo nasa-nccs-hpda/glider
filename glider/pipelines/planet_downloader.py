@@ -1,19 +1,15 @@
 import os
-import csv
-import json
+import sys
 import logging
-import requests
 import geopandas as gpd
 
-from time import sleep
 from datetime import datetime
 from shapely.geometry import shape
 from shapely.geometry import mapping
-from concurrent.futures import ThreadPoolExecutor
 
 from planet import Planet
 from planet import data_filter
-from planet import OrdersClient, DataClient, Session, order_request
+from planet import order_request
 
 
 class PlanetDownloader:
@@ -22,16 +18,16 @@ class PlanetDownloader:
     POLL_INTERVAL = 30
 
     def __init__(
-            self,
-            api_key: str = None,
-            download_dir: str = "./planet_downloads"
-        ):
+                self,
+                api_key: str = None,
+                download_dir: str = "./planet_downloads"
+            ):
 
         # Prefer environment variable if api_key not provided
         self.api_key = api_key or os.getenv("PL_API_KEY")
         if not self.api_key:
             raise ValueError(
-                "Planet API key not provided. Set PL_API_KEY" + \
+                "Planet API key not provided. Set PL_API_KEY" +
                 "env var or pass api_key to PlanetDownloader()."
             )
         self.download_dir = download_dir
@@ -67,7 +63,7 @@ class PlanetDownloader:
 
     def _load_aoi(self, geometry_info: str):
         if isinstance(geometry_info, str):
-            gdf = gpd.read_file(shapefile_path)
+            gdf = gpd.read_file(geometry_info)
             return mapping(gdf.unary_union)
         else:
             return geometry_info
@@ -103,13 +99,13 @@ class PlanetDownloader:
         return
 
     def search(
-            self,
-            geometry_info: str,
-            start_date: str,
-            end_date: str,
-            item_type: list = ["PSScene"],
-            cloud_cover: float = 0.2
-        ):
+                self,
+                geometry_info: str,
+                start_date: str,
+                end_date: str,
+                item_type: list = ["PSScene"],
+                cloud_cover: float = 0.2
+            ):
 
         # setup aoi
         aoi = self._load_aoi(geometry_info)
@@ -150,17 +146,17 @@ class PlanetDownloader:
             yield lst[i: i + chunk_size]
 
     def download(
-            self,
-            geometry_info: str,
-            start_date: str,
-            end_date: str,
-            item_types: list = ["PSScene"],
-            bundles: list = ["analytic_sr"],
-            cloud_cover: float = 0.2,
-            threads: int = 4,
-            overwrite: bool = False,
-            progress_bar: bool = True
-        ):
+                self,
+                geometry_info: str,
+                start_date: str,
+                end_date: str,
+                item_types: list = ["PSScene"],
+                bundles: list = ["analytic_sr"],
+                cloud_cover: float = 0.2,
+                threads: int = 4,
+                overwrite: bool = False,
+                progress_bar: bool = True
+            ):
 
         logging.info('Starting download process...')
 
@@ -186,7 +182,7 @@ class PlanetDownloader:
 
         # iterate over each request
         for chunk in self._chunk_list(item_ids, self.MAX_ITEMS_PER_ORDER):
-            
+
             for item_type in item_types:
 
                 for bundle in bundles:
@@ -206,9 +202,11 @@ class PlanetDownloader:
                         overwrite=overwrite,
                         progress_bar=progress_bar
                     )
+        return
+
 
 if __name__ == '__main__':
-    
+
     # Setup logging
     logging.basicConfig(
         level='INFO',
@@ -218,7 +216,10 @@ if __name__ == '__main__':
 
     # define downloader class
     downloader = PlanetDownloader(
-        download_dir='/explore/nobackup/projects/ilab/projects/GLiDEr/data/planet'
+        download_dir=(
+            '/explore/nobackup/projects/ilab/projects'
+            '/GLiDEr/data/planet'
+        )
     )
 
     # setting up dummy geometry
@@ -226,38 +227,38 @@ if __name__ == '__main__':
     geom = {
         "coordinates": [
             [
-            [
-                -66.7300,
-                18.3000
-            ],
-            [
-                -66.7300,
-                18.2500
-            ],
-            [
-                -66.6500,
-                18.2500
-            ],
-            [
-                -66.6500,
-                18.3000
-            ],
-            [
-                -66.7300,
-                18.3000
-            ]
+                [
+                    -66.7300,
+                    18.3000
+                ],
+                [
+                    -66.7300,
+                    18.2500
+                ],
+                [
+                    -66.6500,
+                    18.2500
+                ],
+                [
+                    -66.6500,
+                    18.3000
+                ],
+                [
+                    -66.7300,
+                    18.3000
+                ]
             ]
         ],
         "type": "Polygon"
     }
 
-    # planet.specs.SpecificationException: item_type 
-    # 'SkySatScene', 'PelicanScene', 'TanagerMethane', 'SkySatVideo', 
+    # planet.specs.SpecificationException: item_type
+    # 'SkySatScene', 'PelicanScene', 'TanagerMethane', 'SkySatVideo',
     # 'TanagerScene', 'REScene', 'SkySatCollect', 'PSScene', 'REOrthoTile'.
 
     # planet.specs.SpecificationException: bundle
-    # 'analytic_udm2', 'analytic_3b_udm2', 'analytic_8b_udm2', 'visual', 
-    # 'basic_analytic_udm2', 'basic_analytic_8b_udm2', 
+    # 'analytic_udm2', 'analytic_3b_udm2', 'analytic_8b_udm2', 'visual',
+    # 'basic_analytic_udm2', 'basic_analytic_8b_udm2',
     # 'analytic_sr_udm2', 'analytic_8b_sr_udm2'.
 
     # Download PlanetScope images (3m SR)
@@ -270,4 +271,3 @@ if __name__ == '__main__':
         cloud_cover=0.2,
         threads=6
     )
- 
